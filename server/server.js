@@ -14,7 +14,30 @@ app.use('/articles', articleRouter)
 // app.use(express.urlencoded({ extended: false }))
 
 app.get('/', (req, res) => {
-    res.render('index')
+
+    const articles = [{
+        title: "article title",
+        createdAt: new Date(),
+        description: "description",
+        markdown: "markdown"
+    },
+    {
+        title: "second article title",
+        createdAt: new Date(),
+        description: "description",
+        markdown: "markdown"
+    },
+    {
+        title: "third article title",
+        createdAt: new Date(),
+        description: "description",
+        markdown: "markdown"
+    }]
+
+    res.render('articles/index', { 
+        title: "Welcome to my Markdown-blog",
+        articles: articles,
+    })
 })
 
 

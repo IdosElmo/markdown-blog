@@ -5,4 +5,8 @@ router.get('/', (req, res) => {
     res.send("Inside Article")
 })
 
+router.get('/new', (req, res) => {
+    res.render("articles/newArticle")
+})
+
 module.exports = router
