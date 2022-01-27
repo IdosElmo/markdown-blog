@@ -9,7 +9,10 @@
 </head>
 <body>
     <div class='container'>
-        new article
+        <h1 class='mb-4'>New Article</h1>
+        <form action='/articles' method="POST">
+            <%- include('_formFields') %>
+        </form>
     </div>
 
 </body>
