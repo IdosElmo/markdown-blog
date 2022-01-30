@@ -1,43 +1,46 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const articleRouter = require('./../routes/article')
+const express = require('express');
+const db = require('./../database/db');
+const { MongoClient } = require('mongodb');
+const articleRouter = require('./../routes/article');
+const bodyparser = require('body-parser');
+const path = require('path');
+const cors = require('cors');
+const { post } = require('./../routes/article');
+const {mongoURI} = require('./../config/keys')
+
+const port = process.env.PORT || 5000;
+
+const client = new MongoClient(mongoURI, 
+    { useUnifiedTopology: true });
+
+client.connect();
+
+// initialize express
 const app = express()
 
-// mongoose.connect('mongodb://localhost/blog', {
-//   useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true
-// })
+// add body parser to server
+app.use(bodyparser.urlencoded({extended: false}));
+
+// add json to server
+app.use(bodyparser.json());
+
+// add cors to server
+app.use(cors());
 
 app.set('view engine', 'ejs')
 
 app.use('/articles', articleRouter)
 
-// app.use(express.urlencoded({ extended: false }))
+app.get('/', async (req, res) => {
 
-app.get('/', (req, res) => {
-
-    const articles = [{
-        title: "article title",
-        createdAt: new Date(),
-        description: "description",
-        markdown: "markdown"
-    },
-    {
-        title: "second article title",
-        createdAt: new Date(),
-        description: "description",
-        markdown: "markdown"
-    },
-    {
-        title: "third article title",
-        createdAt: new Date(),
-        description: "description",
-        markdown: "markdown"
-    }]
+    const postss = await db.getPosts(client)
 
     res.render('articles/index', { 
         title: "Welcome to my Markdown-blog",
-        articles: articles,
+        posts: postss,
     })
 })
 
-app.listen(5000)
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
+})
