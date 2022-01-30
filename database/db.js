@@ -1,34 +1,56 @@
 const res = require('express/lib/response');
 const { redirect } = require('express/lib/response');
-const { MongoClient } = require('mongodb');
-const slugify = require('slugify')
+const { MongoClient, ObjectID } = require('mongodb');
+const { mongoURI } = require('./../config/keys')
 
-function Blog(post) {
-    this.title = post.title;
-    this.slug = post.slug;
-    this.published = post.published;
-    this.author = post.author;
-    this.content = post.content;
-    this.tags = post.tags;
+function Blog() {
+    this.title = null;
+    this.slug = null;
+    this.published = null;
+    this.author = null;
+    this.content = null;
+    this.tags = null;
 }
 
-// function Post(title, published, author, content, tags) {
-//     this.title = title;
-//     this.slug = slugify(this.title, { lower: true, strict: true });
-//     this.published = published;
-//     this.author = author;
-//     this.content = content;
-//     this.tags = tags;
-// }
+let _db; // '_' private
 
-async function getPosts(client) {
+async function start() {
+    _db = new MongoClient(mongoURI, 
+        { useUnifiedTopology: true });
+
+    try {
+        // Connect to the MongoDB cluster
+        await _db.connect();
+
+        // verify connection
+        await _db.db("admin").command({ ping: 1 });
+        console.log("Connection is alive");
+    
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function createNewPost(post) {
+    try {
+        // verify connection
+        await _db.db("admin").command({ ping: 1 });
+
+        const posts = await _db.db().collection("posts").insertOne(post);
+        console.log("Successfully pushed new post to DB")
+    }
+    catch (e) {
+        console.error(e);
+    } 
+}
+
+async function getPosts() {
 
     try {
         // verify connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Connection is alive");
+        await _db.db("admin").command({ ping: 1 });
 
-        const posts = await client.db().collection("posts").find().toArray();
+        const posts = await _db.db().collection("posts").find().toArray();
         return posts;
     }
     catch (e) {
@@ -36,25 +58,57 @@ async function getPosts(client) {
     } 
 }
 
-async function listDatabases(client){
-    await client.db("admin").command({ ping: 1 });
-    databasesList = await client.db().admin().listDatabases();
+async function deletePost(id) {
+    try {
+        // verify connection
+        await _db.db("admin").command({ ping: 1 });
+
+        const posts = await _db.db().collection("posts").deleteOne(
+            {_id: new ObjectID(id)}
+            
+            
+        )
+    }
+    catch (e) {
+        console.error(e);
+    } 
+}
+
+async function listDatabases(){
+    await _db.db("admin").command({ ping: 1 });
+    databasesList = await _db.db().admin().listDatabases();
  
     console.log("Databases:");
     databasesList.databases.forEach(db => console.log(` - ${db.name}`));
 };
 
 module.exports = {
-    listDatabases: (c) => {
-        return listDatabases(c);
+    listDatabases: () => {
+        return listDatabases();
     },
 
     test: () => {
         return console.log("test");
     },
 
-    getPosts: (c) => {
-        return getPosts(c);
+    getPosts: () => {
+        return getPosts();
     },
+
+    start: () => {
+        return start();
+    },
+
+    Blog: () => {
+        return new Blog()
+    },
+
+    newPost: (post) => {
+        return createNewPost(post);
+    },
+
+    deletePost: (id) => {
+        return deletePost(id);
+    }
 
 }

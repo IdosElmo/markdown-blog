@@ -20,9 +20,8 @@
                   <%= post.author %>
                 </div>
                 <div class="card-text mb-2"><%= post.content %></div>
-                <a href="articles/<%= post.slug %>" class="btn btn-primary">Read More</a>
-                <a href="articles/edit/<%= post.id %>" class="btn btn-info">Edit</a>
-                <form action="/articles/<%= post.id %>?_method=DELETE" method="POST" class="d-inline">
+                <a href="articles/edit/<%= post._id %>" class="btn btn-info">Edit</a>
+                <form action="/articles/<%= post._id %>?_method=DELETE" method="POST" class="d-inline">
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </div>

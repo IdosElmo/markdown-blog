@@ -19,5 +19,6 @@ This project is inspired by [Web Dev Simplified](https://www.youtube.com/watch?v
 # Setup
 - git clone https://github.com/IdosElmo/markdown-blog.git
 - npm i
+- change mongoDB URI in server/server.js
 - npm run devStart
 - navigate in your browser to localhost:5000
